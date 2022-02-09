@@ -30,3 +30,13 @@
 *.exe
 *.out
 *.app
+
+# other
+/.vs
+/x64
+/Games2D/x64
+/Games2D/*.vcxproj
+/Games2D/*.vcxproj.filters
+/Games2D/*.vcxproj.user
+SFML_Games.sln
+

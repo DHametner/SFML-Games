@@ -176,9 +176,7 @@ namespace gms
 				bestMoves.push_back(validMoves.front());
 			}
 			else if (score == bestScore)
-			{
 				bestMoves.push_back(validMoves.front());
-			}
 			board->at(validMoves.front()).ownerId = 0;
 			validMoves.pop_front();
 		}
@@ -187,7 +185,7 @@ namespace gms
 		std::uniform_real_distribution<double_t> distrib(0.0, bestMoves.size());
 
 		std::cout << bestMoves.size();
-		return bestMoves[(size_t)distrib(random)];
+		return bestMoves[bestMoves.size() -1];
 	}
 
 	int32_t TicTacToe::getPlayerMove(int32_t playerId)

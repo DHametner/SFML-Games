@@ -105,22 +105,13 @@ namespace gms
 		return false;
 	}
 
-	int32_t ConnectFour::getComputerMove()
-	{
-		std::random_device random;
-		std::mt19937 mt(random());
-		std::uniform_real_distribution<double_t> distrib(0.0, config.columns);
-
-		return (int32_t)distrib(random);
-	}
-
 	int32_t ConnectFour::getPlayerMove(int32_t playerId)
 	{
 		if (playerId < 1 || playerId > 2)
 			return -1;
 
 		if (isSingleplayer && playerId == 2)
-			return getComputerMove();
+			return -1000;
 
 		sf::Vector2i pos = sf::Mouse::getPosition(*window);
 

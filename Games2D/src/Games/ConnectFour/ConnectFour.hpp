@@ -18,8 +18,6 @@ namespace gms
 
 		bool hasWon(int32_t) override;
 
-		int32_t getComputerMove() override;
-
 		int32_t getPlayerMove(int32_t) override;
 	};
 }

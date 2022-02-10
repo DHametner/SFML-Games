@@ -3,15 +3,15 @@
 
 namespace gms
 {
-	TicTacToe::TicTacToe()
-		: Game()
+	TicTacToe::TicTacToe(bool singleplayer)
+		: Game(singleplayer)
 	{
 		config.columns = TICTACTOE_COLUMNS;
-		config.rows    = TICTACTOE_ROWS;
-		config.border  = 40.0f;
-		config.name    = "TicTacToe";
+		config.rows = TICTACTOE_ROWS;
+		config.border = 40.0f;
+		config.name = "TicTacToe";
 
-		board = std::make_unique<TicTacToeBoard>();
+		board = std::make_shared<TicTacToeBoard>();
 		board->configure(config);
 
 		initialize();
@@ -27,7 +27,7 @@ namespace gms
 
 	bool TicTacToe::hasWon(int32_t playerId)
 	{
-		if (playerId == NULL)
+		if (playerId < 1 || playerId > 2)
 			return false;
 
 		if (context->currentState() == State::Won)
@@ -47,10 +47,8 @@ namespace gms
 				{
 					board->at(idx).ownerId == playerId ? winCount++ : winCount = 0;
 
-					if (winCount == 3) {
-						context->changeState(State::Won);
+					if (winCount == 3)
 						return true;
-					}
 				}
 			}
 
@@ -62,10 +60,8 @@ namespace gms
 				{
 					board->at(idx).ownerId == playerId ? winCount++ : winCount = 0;
 
-					if (winCount == 3) {
-						context->changeState(State::Won);
+					if (winCount == 3)
 						return true;
-					}
 				}
 			}
 
@@ -75,10 +71,8 @@ namespace gms
 			{
 				board->at(pos).ownerId == playerId ? winCount++ : winCount = 0;
 
-				if (winCount == 3) {
-					context->changeState(State::Won);
+				if (winCount == 3)
 					return true;
-				}
 			}
 
 			// backward diagonal check
@@ -87,17 +81,123 @@ namespace gms
 			{
 				board->at(pos).ownerId == playerId ? winCount++ : winCount = 0;
 
-				if (winCount == 3) {
-					context->changeState(State::Won);
+				if (winCount == 3)
 					return true;
-				}
 			}
 		}
 		return false;
 	}
 
-	int32_t TicTacToe::getPlayerMove()
+	std::list<int32_t> TicTacToe::getValidMoves()
 	{
+		std::list<int32_t> validMoves;
+
+		for (int32_t idx = 0; idx < config.columns * config.rows; idx++)
+		{
+			if (board->at(idx).ownerId == 0)
+				validMoves.push_back(idx);
+		}
+		return validMoves;
+	}
+
+	int32_t TicTacToe::evaluateScore()
+	{
+		if (hasWon(playerOne.id))
+			return 10;
+		else if (hasWon(playerTwo.id))
+			return -10;
+		return 0;
+	}
+
+	int32_t TicTacToe::minMove()
+	{
+		int32_t bestScore = 10;
+		int32_t moveScore = evaluateScore();
+
+		if (moveScore == 10 || moveScore == -10)
+			return moveScore;
+
+		std::list<int32_t> validMoves = getValidMoves();
+
+		while (!validMoves.empty())
+		{
+			board->at(validMoves.front()).ownerId = playerOne.id;
+
+			int32_t score = maxMove();
+
+			if (score < bestScore)
+				bestScore = score;
+			board->at(validMoves.front()).ownerId = 0;
+			validMoves.pop_front();
+		}
+		return bestScore;
+	}
+
+	int32_t TicTacToe::maxMove()
+	{
+		int32_t bestScore = -10;
+		int32_t moveScore = evaluateScore();
+
+		if (moveScore == 10 || moveScore == -10)
+			return moveScore;
+
+		std::list<int32_t> validMoves = getValidMoves();
+
+		while (!validMoves.empty())
+		{
+			board->at(validMoves.front()).ownerId = playerTwo.id;
+
+			int32_t score = minMove();
+
+			if (score > bestScore)
+				bestScore = score;
+			board->at(validMoves.front()).ownerId = 0;
+			validMoves.pop_front();
+		}
+		return bestScore;
+	}
+
+	int32_t TicTacToe::minimax()
+	{
+		std::vector<int32_t> bestMoves;
+		int32_t bestScore = -10;
+
+		std::list<int32_t> validMoves = getValidMoves();
+
+		while (!validMoves.empty())
+		{
+			board->at(validMoves.front()).ownerId = playerTwo.id;
+			int32_t score = minMove();
+
+			if (score > bestScore)
+			{
+				bestScore = score;
+				bestMoves.clear();
+				bestMoves.push_back(validMoves.front());
+			}
+			else if (score == bestScore)
+			{
+				bestMoves.push_back(validMoves.front());
+			}
+			board->at(validMoves.front()).ownerId = 0;
+			validMoves.pop_front();
+		}
+		std::random_device random;
+		std::mt19937 mt(random());
+		std::uniform_real_distribution<double_t> distrib(0.0, bestMoves.size());
+
+		std::cout << bestMoves.size();
+		return bestMoves[(size_t)distrib(random)];
+	}
+
+	int32_t TicTacToe::getPlayerMove(int32_t playerId)
+	{
+		if (playerId < 1 || playerId > 2)
+			return -1;
+
+		if (isSingleplayer && playerId == 2)
+			return minimax();
+
 		sf::Vector2i pos = sf::Mouse::getPosition(*window);
 
 		int32_t dx = (int32_t)(pos.x - config.border / 2);

@@ -3,7 +3,8 @@
 
 namespace gms
 {
-	Game::Game()
+	Game::Game(bool singleplayer)
+		: isSingleplayer(singleplayer)
 	{
 		context = GameContext::getInstance();
 	}
@@ -20,9 +21,21 @@ namespace gms
 		playerOne.name = "Player One";
 
 		playerTwo.id = 2;
-		playerTwo.name = "Player Two";
+		playerTwo.name = isSingleplayer ? "Computer Player" : "Player Two";
 
 		context->changeState(State::Running);
+	}
+
+	void Game::performMove(const Player* player)
+	{
+		while (!board->applyMove(getPlayerMove(player->id), *player));
+
+		update();
+
+		if (board->isFull())
+			context->changeState(State::Full);
+		else if (hasWon(player->id))
+			context->changeState(State::Won);
 	}
 
 	void Game::update()
@@ -33,16 +46,16 @@ namespace gms
 		float_t xPos = 0.0f;
 
 		//draw grid
-		int32_t columID = 0;
+		int32_t columId = 0;
 		for (int32_t rowIdx = 0; rowIdx < config.rows; rowIdx++)
 		{
 			int32_t idx;
-			for (idx = columID; idx < config.columns + config.columns * rowIdx; idx++)
+			for (idx = columId; idx < config.columns + config.columns * rowIdx; idx++)
 			{
-				if ((idx - columID) == 0)
-					xPos = config.border + (idx - columID) * config.kCellSize.x;
+				if ((idx - columId) == 0)
+					xPos = config.border + (idx - columId) * config.kCellSize.x;
 				else
-					xPos = config.border + config.border * (idx - columID) + (idx - columID) * config.kCellSize.x;
+					xPos = config.border + config.border * (idx - columId) + (idx - columId) * config.kCellSize.x;
 
 				if (rowIdx == 0)
 					yPos = config.border + rowIdx * config.kCellSize.y;
@@ -56,7 +69,7 @@ namespace gms
 
 				window->draw(board->at(idx).cell);
 			}
-			columID = idx;
+			columId = idx;
 		}
 		window->display(); //window display
 	}
@@ -80,15 +93,18 @@ namespace gms
 					break;
 
 				case sf::Event::MouseButtonPressed:
-
-					if (board->applyMove(getPlayerMove(), *currentPlayer))
+					if (context->currentState() == State::Running)
 					{
-						update();
+						performMove(currentPlayer);
 
-						if (board->isFull())
-							context->changeState(State::Full);
-						else if (hasWon(currentPlayer->id))
-							context->changeState(State::Won);
+						if (isSingleplayer && context->currentState() == State::Running) {
+							using namespace std::this_thread;     // sleep_for, sleep_until
+							using namespace std::chrono_literals; // ns, us, ms, s, h, etc.
+							using std::chrono::system_clock;
+
+							sleep_for(150ms);
+							performMove(&playerTwo);
+						}
 						else
 						{
 							if (currentPlayer->id == 1)
@@ -109,14 +125,14 @@ namespace gms
 
 	GameContext* GameContext::getInstance()
 	{
-		if (instance == NULL)
+		if (instance == nullptr)
 			instance = new GameContext;
 		return instance;
 	}
 
 	bool GameContext::destroyInstance()
 	{
-		if (instance == NULL)
+		if (instance == nullptr)
 			return false;
 
 		std::free(instance);
@@ -128,16 +144,19 @@ namespace gms
 		switch (m_state)
 		{
 		case State::Running:
-		case State::Full:
 		case State::Unknown:
 			m_state = state;
 			break;
+		case State::Full:
 		case State::Won:
+			if (m_state == State::Full)
+				m_state = state;
+			break;
 		default:
 			break;
 		}
 	}
-	
+
 	State GameContext::currentState()
 	{
 		return m_state;

@@ -33,14 +33,16 @@ namespace gms
 		GameContext* context;
 		Player       playerOne;
 		Player       playerTwo;
+		bool		 isSingleplayer;
 
-		std::unique_ptr<IBoard2D>         board;
+		std::shared_ptr<IBoard2D>         board;
 		std::unique_ptr<sf::RenderWindow> window;
 	public:
-		Game();
+		Game(bool);
 		virtual ~Game() = default;
 
-	private:
+		void performMove(const Player*);
+
 		void update();
 
 	public:

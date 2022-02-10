@@ -3,15 +3,15 @@
 
 namespace gms
 {
-	ConnectFour::ConnectFour()
-		: Game()
+	ConnectFour::ConnectFour(bool singleplayer)
+		: Game(singleplayer)
 	{
 		config.columns = CONNECTFOUR_COLUMNS;
 		config.rows    = CONNECTFOUR_ROWS;
 		config.border  = 40.0f;
 		config.name    = "ConnectFour";
 
-		board = std::make_unique<ConnectFourBoard>();
+		board = std::make_shared<ConnectFourBoard>();
 		board->configure(config);
 
 		initialize();
@@ -27,7 +27,7 @@ namespace gms
 
 	bool ConnectFour::hasWon(int32_t playerId)
 	{
-		if (playerId == NULL)
+		if (playerId < 1 || playerId > 2)
 			return false;
 
 		if (context->currentState() == State::Won)
@@ -50,10 +50,7 @@ namespace gms
 					(board->at(idx).ownerId == playerId) ? winCount++ : winCount = 0;
 
 					if (winCount == 4)
-					{
-						context->changeState(State::Won);
 						return true;
-					}
 				}
 				idx++;
 			}
@@ -68,10 +65,7 @@ namespace gms
 					(board->at(idx).ownerId == playerId) ? winCount++ : winCount = 0;
 
 					if (winCount == 4)
-					{
-						context->changeState(State::Won);
 						return true;
-					}
 				}
 				rowIdx += 7;
 			}
@@ -87,10 +81,7 @@ namespace gms
 						(board->at(idx).ownerId == playerId) ? winCount++ : winCount = 0;
 
 						if (winCount == 4)
-						{
-							context->changeState(State::Won);
 							return true;
-						}
 					}
 				}
 			}
@@ -106,10 +97,7 @@ namespace gms
 						(board->at(idx).ownerId == playerId) ? winCount++ : winCount = 0;
 
 						if (winCount == 4)
-						{
-							context->changeState(State::Won);
 							return true;
-						}
 					}
 				}
 			}
@@ -117,8 +105,23 @@ namespace gms
 		return false;
 	}
 
-	int32_t ConnectFour::getPlayerMove()
+	int32_t ConnectFour::getComputerMove()
 	{
+		std::random_device random;
+		std::mt19937 mt(random());
+		std::uniform_real_distribution<double_t> distrib(0.0, config.columns);
+
+		return (int32_t)distrib(random);
+	}
+
+	int32_t ConnectFour::getPlayerMove(int32_t playerId)
+	{
+		if (playerId < 1 || playerId > 2)
+			return -1;
+
+		if (isSingleplayer && playerId == 2)
+			return getComputerMove();
+
 		sf::Vector2i pos = sf::Mouse::getPosition(*window);
 
 		int32_t dx = (int32_t)(pos.x - config.border / 2);

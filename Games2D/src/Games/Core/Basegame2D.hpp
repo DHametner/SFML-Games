@@ -25,7 +25,7 @@ namespace gms
 	public:
 		virtual bool hasWon(int32_t) = 0;
 		
-		virtual int32_t getPlayerMove() = 0;
+		virtual int32_t getPlayerMove(int32_t) = 0;
 
 		virtual void run() = 0;
 	};

@@ -9,7 +9,7 @@ namespace gms
 	class ConnectFour : public Game
 	{
 	public:
-		ConnectFour();
+		ConnectFour(bool);
 		ConnectFour(const ConnectFour&) = default;
 		virtual ~ConnectFour() = default;
 
@@ -18,6 +18,8 @@ namespace gms
 
 		bool hasWon(int32_t) override;
 
-		int32_t getPlayerMove() override;
+		int32_t getComputerMove() override;
+
+		int32_t getPlayerMove(int32_t) override;
 	};
 }

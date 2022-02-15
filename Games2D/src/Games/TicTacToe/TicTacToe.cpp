@@ -106,7 +106,9 @@ namespace gms
 			return 10;
 		else if (hasWon(playerTwo.id)) // O has won
 			return -10;
-		return 0;
+		else if (board->isFull()) // its a tie
+			return 0;
+		return -1; // game still running
 	}
 
 	int32_t TicTacToe::minMove()
@@ -114,7 +116,7 @@ namespace gms
 		int32_t bestScore = INT32_MAX;
 		int32_t moveScore = evaluateScore();
 
-		if (moveScore == 10 || moveScore == -10)
+		if (moveScore != -1)
 			return moveScore;
 
 		std::list<int32_t> validMoves = getValidMoves();
@@ -137,7 +139,7 @@ namespace gms
 		int32_t bestScore = -INT32_MAX;
 		int32_t moveScore = evaluateScore();
 
-		if (moveScore == 10 || moveScore == -10)
+		if (moveScore != -1)
 			return moveScore;
 
 		std::list<int32_t> validMoves = getValidMoves();
@@ -174,8 +176,8 @@ namespace gms
 				bestMoves.clear();
 				bestMoves.push_back(validMoves.front());
 			}
-			//else if (score == bestScore)
-			//	bestMoves.push_back(validMoves.front());
+			else if (score == bestScore)
+				bestMoves.push_back(validMoves.front());
 			board->at(validMoves.front()).ownerId = 0;
 			validMoves.pop_front();
 		}

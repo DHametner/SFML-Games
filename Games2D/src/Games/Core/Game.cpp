@@ -23,7 +23,7 @@ namespace gms
 		playerTwo.id = 2;
 		playerTwo.name = isSingleplayer ? "Computer Player" : "Player Two";
 
-		context->changeState(State::Running);
+		context->changeState(states::Running);
 	}
 
 	void Game::performMove(const Player* player)
@@ -33,9 +33,9 @@ namespace gms
 		update();
 
 		if (board->isFull())
-			context->changeState(State::Full);
+			context->changeState(states::Full);
 		else if (hasWon(player->id))
-			context->changeState(State::Won);
+			context->changeState(states::Won);
 	}
 
 	void Game::update()
@@ -93,11 +93,11 @@ namespace gms
 					break;
 
 				case sf::Event::MouseButtonPressed:
-					if (context->currentState() == State::Running)
+					if (context->currentState() == states::Running)
 					{
 						performMove(currentPlayer);
 
-						if (isSingleplayer && context->currentState() == State::Running) {
+						if (isSingleplayer && context->currentState() == states::Running) {
 							using namespace std::this_thread;     // sleep_for, sleep_until
 							using namespace std::chrono_literals; // ns, us, ms, s, h, etc.
 							using std::chrono::system_clock;
@@ -139,17 +139,17 @@ namespace gms
 		return true;
 	}
 
-	void GameContext::changeState(const State& state)
+	void GameContext::changeState(const states::state_t& state)
 	{
 		switch (m_state)
 		{
-		case State::Running:
-		case State::Unknown:
+		case states::Running:
+		case states::Unknown:
 			m_state = state;
 			break;
-		case State::Full:
-		case State::Won:
-			if (m_state == State::Full)
+		case states::Full:
+		case states::Won:
+			if (m_state == states::Full)
 				m_state = state;
 			break;
 		default:
@@ -157,7 +157,7 @@ namespace gms
 		}
 	}
 
-	State GameContext::currentState()
+	states::state_t GameContext::currentState()
 	{
 		return m_state;
 	}

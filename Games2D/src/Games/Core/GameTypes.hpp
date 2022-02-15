@@ -2,10 +2,13 @@
 
 namespace gms
 {
-	enum class Type
+	namespace types
 	{
-		TicTacToe,
-		ConnectFour,
-		Unknown
-	};
+		typedef enum
+		{
+			TicTacToe,
+			ConnectFour,
+			Unknown
+		} type_t;
+	}
 }

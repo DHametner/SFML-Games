@@ -2,11 +2,14 @@
 
 namespace gms
 {
-	enum class State
+	namespace states
 	{
-		Running,
-		Full,
-		Won,
-		Unknown
-	};
+		typedef enum
+		{
+			Running,
+			Full,
+			Won,
+			Unknown
+		} state_t;
+	}
 }

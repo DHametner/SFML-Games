@@ -37,6 +37,8 @@ namespace gms
 
 		virtual Field& at(int32_t) = 0;
 
+		virtual void print() = 0;
+
 		virtual bool applyMove(int32_t, const Player&) = 0;
 	};
 }

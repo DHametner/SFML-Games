@@ -13,6 +13,8 @@ namespace gms
 		virtual ~TicTacToeBoard() = default;
 
 	public:
+		void print() override;
+
 		bool applyMove(int32_t, const Player&) override;
 	};
 }

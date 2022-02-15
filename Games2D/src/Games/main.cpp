@@ -8,7 +8,7 @@ int main()
 {
     using namespace gms;
 
-    IGame2D* game = GameFactory::createGame(Type::TicTacToe, true);
+    IGame2D* game = GameFactory::createGame(types::TicTacToe, true);
 
     if (game == NULL)
         return EXIT_FAILURE;

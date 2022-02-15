@@ -30,10 +30,10 @@ namespace gms
 		if (playerId < 1 || playerId > 2)
 			return false;
 
-		if (context->currentState() == State::Won)
+		if (context->currentState() == states::Won)
 			return true;
 
-		if (context->currentState() == State::Running)
+		if (context->currentState() == states::Running)
 		{
 			int32_t size = config.columns * config.rows;
 			int32_t winCount = 0;
@@ -102,16 +102,16 @@ namespace gms
 
 	int32_t TicTacToe::evaluateScore()
 	{
-		if (hasWon(playerOne.id))
+		if (hasWon(playerOne.id)) // X has won
 			return 10;
-		else if (hasWon(playerTwo.id))
+		else if (hasWon(playerTwo.id)) // O has won
 			return -10;
 		return 0;
 	}
 
 	int32_t TicTacToe::minMove()
 	{
-		int32_t bestScore = 10;
+		int32_t bestScore = INT32_MAX;
 		int32_t moveScore = evaluateScore();
 
 		if (moveScore == 10 || moveScore == -10)
@@ -122,11 +122,10 @@ namespace gms
 		while (!validMoves.empty())
 		{
 			board->at(validMoves.front()).ownerId = playerOne.id;
-
+			//board->print();
 			int32_t score = maxMove();
 
-			if (score < bestScore)
-				bestScore = score;
+			bestScore = std::min(score, bestScore);
 			board->at(validMoves.front()).ownerId = 0;
 			validMoves.pop_front();
 		}
@@ -135,7 +134,7 @@ namespace gms
 
 	int32_t TicTacToe::maxMove()
 	{
-		int32_t bestScore = -10;
+		int32_t bestScore = -INT32_MAX;
 		int32_t moveScore = evaluateScore();
 
 		if (moveScore == 10 || moveScore == -10)
@@ -146,11 +145,10 @@ namespace gms
 		while (!validMoves.empty())
 		{
 			board->at(validMoves.front()).ownerId = playerTwo.id;
-
+			//board->print();
 			int32_t score = minMove();
 
-			if (score > bestScore)
-				bestScore = score;
+			bestScore =std::max(score, bestScore);
 			board->at(validMoves.front()).ownerId = 0;
 			validMoves.pop_front();
 		}
@@ -160,32 +158,33 @@ namespace gms
 	int32_t TicTacToe::minimax()
 	{
 		std::vector<int32_t> bestMoves;
-		int32_t bestScore = -10;
+		int32_t bestScore = INT32_MAX;
 
 		std::list<int32_t> validMoves = getValidMoves();
 
 		while (!validMoves.empty())
 		{
 			board->at(validMoves.front()).ownerId = playerTwo.id;
+			//board->print();
 			int32_t score = minMove();
 
-			if (score > bestScore)
+			if (score < bestScore)
 			{
 				bestScore = score;
 				bestMoves.clear();
 				bestMoves.push_back(validMoves.front());
 			}
-			else if (score == bestScore)
-				bestMoves.push_back(validMoves.front());
+			//else if (score == bestScore)
+			//	bestMoves.push_back(validMoves.front());
 			board->at(validMoves.front()).ownerId = 0;
 			validMoves.pop_front();
 		}
 		std::random_device random;
 		std::mt19937 mt(random());
-		std::uniform_real_distribution<double_t> distrib(0.0, bestMoves.size());
+		std::uniform_int_distribution<int32_t> distrib(0, bestMoves.size() - 1);
 
-		std::cout << bestMoves.size();
-		return bestMoves[bestMoves.size() -1];
+		//std::cout << bestMoves.size();
+		return bestMoves[distrib(random)];
 	}
 
 	int32_t TicTacToe::getPlayerMove(int32_t playerId)

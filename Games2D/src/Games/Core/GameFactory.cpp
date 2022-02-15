@@ -4,20 +4,19 @@
 
 namespace gms
 {
-	IGame2D* GameFactory::createGame(const Type& type, bool singleplayer)
+	IGame2D* GameFactory::createGame(const types::type_t& type, bool singleplayer)
 	{
 		IGame2D* game = nullptr;
 
 		switch (type)
 		{
-		case Type::TicTacToe:
+		case types::TicTacToe:
 			game = new TicTacToe(singleplayer);
 			break;
-		case Type::ConnectFour:
-
+		case types::ConnectFour:
 			game = new ConnectFour(singleplayer);
 			break;	
-		case Type::Unknown:
+		case types::Unknown:
 		default:
 			break;
 		}

@@ -45,7 +45,7 @@ namespace gms
 
 	bool ConnectFourBoard::applyMove(int32_t move, const Player& player)
 	{
-		if (context->currentState() == states::Running)
+		if (context->currentState() == State::Running)
 		{
 			if (move < 0 || move > config.columns - 1)
 				return false;

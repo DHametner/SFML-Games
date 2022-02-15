@@ -11,7 +11,7 @@ namespace gms
 		static GameContext* instance;
 
 	private:
-		states::state_t m_state = states::Unknown;
+		State m_state = State::Unknown;
 
 	private:
 		GameContext() = default;
@@ -22,9 +22,9 @@ namespace gms
 
 		static bool destroyInstance();
 
-		void changeState(const states::state_t&);
+		void changeState(const State&);
 
-		states::state_t currentState();
+		State currentState();
 	};
 
 	class Game : public IGame2D

@@ -38,7 +38,7 @@ namespace gms
 	template<size_t Size>
 	inline bool Board<Size>::isFull()
 	{
-		if (context->currentState() == states::Full)
+		if (context->currentState() == State::Full)
 			return true;
 
 		for (int32_t idx = 0; idx < cells.size(); idx++)

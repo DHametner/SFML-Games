@@ -30,10 +30,10 @@ namespace gms
 		if (playerId < 1 || playerId > 2)
 			return false;
 
-		if (context->currentState() == states::Won)
+		if (context->currentState() == State::Won)
 			return true;
 
-		if (context->currentState() == states::Running)
+		if (context->currentState() == State::Running)
 		{
 			int32_t size = config.columns * config.rows;
 			int32_t columnIdx = 0;

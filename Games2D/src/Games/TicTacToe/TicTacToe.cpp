@@ -103,9 +103,9 @@ namespace gms
 	int32_t TicTacToe::evaluateScore()
 	{
 		if (hasWon(playerOne.id)) // X has won
-			return 10;
-		else if (hasWon(playerTwo.id)) // O has won
 			return -10;
+		else if (hasWon(playerTwo.id)) // O has won
+			return 10;
 		else if (board->isFull()) // its a tie
 			return 0;
 		return -1; // game still running
@@ -160,24 +160,24 @@ namespace gms
 	int32_t TicTacToe::minimax()
 	{
 		std::vector<int32_t> bestMoves;
-		int32_t bestScore = INT32_MAX;
+		int32_t bestScore = -INT32_MAX;
 
 		std::list<int32_t> validMoves = getValidMoves();
 
 		while (!validMoves.empty())
 		{
 			board->at(validMoves.front()).ownerId = playerTwo.id;
-			//board->print();
 			int32_t score = minMove();
 
-			if (score < bestScore)
+			if (score > bestScore)
 			{
 				bestScore = score;
+
 				bestMoves.clear();
 				bestMoves.push_back(validMoves.front());
 			}
-			//else if (score == bestScore)
-			//	bestMoves.push_back(validMoves.front());
+			else if (score == bestScore)
+				bestMoves.push_back(validMoves.front());
 			board->at(validMoves.front()).ownerId = 0;
 			validMoves.pop_front();
 		}

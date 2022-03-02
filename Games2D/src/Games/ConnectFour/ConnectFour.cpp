@@ -111,7 +111,7 @@ namespace gms
 			return -1;
 
 		if (isSingleplayer && playerId == 2)
-			return -1000;
+			return 1000;//minimax();
 
 		sf::Vector2i pos = sf::Mouse::getPosition(*window);
 
